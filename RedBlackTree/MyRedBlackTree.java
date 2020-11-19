@@ -82,37 +82,47 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
         }
     }
 
+    /**
+     * 向红黑树中插入键值对
+     * @param key 键
+     * @param value 值
+     */
     public void put(K key, V value){
         RBNode t = this.root;
         //如果根结点为空，将插入的结点作为根结点
         if(t == null){
             t = new RBNode<>(key, value == null ? key : value, null);
         }
-
-        int cmp;
-        RBNode parent;
+        int cmp; //比较结果
+        RBNode parent; //父节点的指针
         if(key == null){
             throw new NullPointerException();
         }
         do{
+            //从根节点开始比较
             parent = t;
             cmp = key.compareTo((K)t.key);
+            //如果比0小，在根结点的左子树中查找
             if(cmp < 0){
                 t = t.left;
             }
+            //否则再右子树中查找
             else if(cmp > 0){
                 t = t.right;
             }
+            //如果找到一样的键，则将值更新
             else{
                 t.value = value;
             }
         } while(t != null);
-
+        //新建一个新的插入结点，父节点是当前的叶子结点
         RBNode node = new RBNode<>(key, value == null ? key : value, parent);
         if(cmp < 0){
+            //如果cmp<0，则将新节点设为那个叶子结点的左子结点
             parent.left = node;
         }
         else{
+            //否则设为右子结点
             parent.right = node;
         }
     }
