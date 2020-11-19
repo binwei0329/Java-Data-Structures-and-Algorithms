@@ -5,7 +5,6 @@
  * @author Wei Bin 魏斌
  * @date 2020/11/19
  */
-
 public class MyRedBlackTree<K extends Comparable<K>, V> {
     private static boolean RED = false;
     private static boolean BLACK = true;
@@ -239,7 +238,23 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
         return node == null ? null : node.right;
     }
 
-    class RBNode<K extends Comparable<K>, V>{
+    public void getNodeColor(){
+        if(root != null){
+            getColor(root);
+        }
+    }
+
+    private void getColor(RBNode node){
+        if(node.left != null){
+            getColor(node.left);
+        }
+        System.out.println(node.color);
+        if(node.right != null){
+            getColor(node.right);
+        }
+    }
+
+    static class RBNode<K extends Comparable<K>, V>{
         private RBNode parent;
         private RBNode left;
         private RBNode right;
@@ -264,5 +279,38 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
             this.key = key;
             this.value = value;
         }
+        public boolean isColor() {
+            return color;
+        }
+        public RBNode getLeft() {
+            return left;
+        }
+        public RBNode getRight() {
+            return right;
+        }
+        public V getValue() {
+            return value;
+        }
     }
+
+    public void inorderTraverse(){
+        if(root == null){
+            throw new NullPointerException();
+        }
+        inorder(root);
+    }
+
+    private void inorder(RBNode node){
+        if(node == null){
+            throw new NullPointerException();
+        }
+        inorder(node.left);
+        System.out.print(node.color + " ");
+        inorder(node.right);
+    }
+
+    public RBNode getRoot(){
+        return root;
+    }
+
 }
