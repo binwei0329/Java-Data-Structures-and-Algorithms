@@ -48,23 +48,35 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
         }
     }
 
+    /**
+     * 围绕着结点p进行右旋转
+     * @param p 结点
+     */
     private void rightRotate(RBNode p){
         if(p != null){
+            //赋予p的左子结点一个引用
             RBNode l = p.left;
+            //p的左子节点指向l的右子结点
             p.left = l.right;
+            //假如l的右子结点不为空，则将l的右子结点的父节点设为p
             if(l.right != null){
                 l.right.parent = p;
             }
+            //将l的父节点设置为p的父节点
             l.parent = p.parent;
+            //假如o的父节点为空，则p为根结点，右旋转将l设为根结点
             if(p.parent == null){
                 root = l;
             }
+            //如果p是p的父节点的右子结点，则将p的父节点的右子结点设为l
             else if(p.parent.right == p){
                 p.parent.right = l;
             }
+            //反之将p的父节点的左子结点设为l
             else{
                 p.parent.right = l;
             }
+            //l的右子结点设为p，p的父节点设为l
             l.right = p;
             p.parent = l;
         }
@@ -168,22 +180,6 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
         return node == null ? null : node.right;
     }
 
-    public void getNodeColor(){
-        if(root != null){
-            getColor(root);
-        }
-    }
-
-    private void getColor(RBNode node){
-        if(node.left != null){
-            getColor(node.left);
-        }
-        System.out.println(node.color);
-        if(node.right != null){
-            getColor(node.right);
-        }
-    }
-
     class RBNode<K extends Comparable<K>, V>{
         private RBNode parent;
         private RBNode left;
@@ -209,22 +205,5 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
             this.key = key;
             this.value = value;
         }
-    }
-
-    public void inorderTraverse(){
-        if(root == null){
-            throw new NullPointerException();
-        }
-        inorder(root);
-    }
-
-    private void inorder(RBNode node){
-        if(node == null){
-            throw new NullPointerException();
-        }
-        inorder(node.left);
-        System.out.print(node.color + " ");
-        inorder(node.right);
-
     }
 }
