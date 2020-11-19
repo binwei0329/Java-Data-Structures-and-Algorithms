@@ -1,3 +1,11 @@
+/**
+ * 本类实现了一个红黑树及其插入删除操作。
+ * @param <K> 插入的数据的键的类型
+ * @param <V> 插入的数据值的类型
+ * @author Wei Bin 魏斌
+ * @date 2020/11/19
+ */
+
 public class MyRedBlackTree<K extends Comparable<K>, V> {
     private static boolean RED = false;
     private static boolean BLACK = true;
@@ -127,47 +135,88 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
         }
     }
 
+    /**
+     * 1、2-3-4树：新增元素+2节点合并（节点中只有1个元素）=3节点（节点中有2个元素）
+     *    红黑树：新增一个红色节点+黑色父亲节点=上黑下红（2节点）--------------------不要调整
+     *
+     * 2、2-3-4树：新增元素+3节点合并（节点中有2个元素）=4节点（节点中有3个元素）
+     *    这里有4种小情况（左3，右3，还有2个左中右不需要调整）------左3，右3需要调整，其余2个不需要调整
+     *    红黑树：新增红色节点+上黑下红=排序后中间节点是黑色，两边节点都是红色（3节点）
+     *
+     * 3、2-3-4树：新增一个元素+4节点合并=原来的4节点分裂，中间元素升级为父节点，新增元素与剩下的其中一个合并
+     *    红黑树：新增红色节点+爷爷节点黑，父节点和叔叔节点都是红色=爷爷节点变红，父亲和叔叔变黑，如果爷爷是根节点，则再变黑
+     *
+     *
+     * @param x
+     */
     private void fixAferPut(RBNode x){
+        //将被添加结点的颜色设为红色
         x.color = RED;
-
+        //如果父节点为黑色，则不需要调整，直接添加即可
+        //如果x不是黑色结点并且x不是根结点，同时x的父节点的颜色为红色
         while(x != null && x != root && x.parent.color == RED){
+            //如果x的父节点是爷爷结点的左子结点
             if(parentOf(x) == leftOf(parentOf(parentOf(x)))){
+                //给叔叔结点一个引用
                  RBNode y = rightOf(parentOf(parentOf(x)));
+                 //如果叔叔结点的颜色为红色，这对应第三种情形
                  if(colorOf(y) == RED){
+                     //将x的父亲结点和叔叔节点的颜色设为黑色，爷爷结点设为红色
                      setColor(parentOf(x), BLACK);
                      setColor(y, BLACK);
                      setColor(parentOf(parentOf(x)), RED);
+                     //爷爷节点向上递归
+                     x=parentOf(parentOf(x));
                  }
+                 //第二种情形
                 else{
+                    //如果x是x的父节点的右子结点
                     if(rightOf(parentOf(x)) ==  x){
+                        //围绕x的父节点进行左旋转
                         x = parentOf(x);
                         leftRotate(x);
                     }
+                    //如果是左3，即添加的结点是原来叶子节点的左子结点，
+                     // 原来叶子结点是是其父节点的左子结点，则将x的父节点设为红色，
+                     // 爷爷结点设为黑色，并且围绕爷爷结点进行右旋转
                     setColor(parentOf(x), BLACK);
                     setColor(parentOf(parentOf(x)), RED);
                     rightRotate(parentOf(parentOf(x)));
+                    //爷爷结点向上递归
                     x = parentOf(parentOf(x));
                 }
             }
 
+            //如果x的父节点是爷爷结点的右子结点
             else{
+                //给叔叔结点一个引用
                 RBNode y = leftOf(parentOf(parentOf(x)));
+                //第二种情形
                 if(colorOf(y) == RED){
+                    //父节点和叔叔结点设为黑色，爷爷结点设为红色
                     setColor(parentOf(x), BLACK);
                     setColor(y, BLACK);
                     setColor(parentOf(parentOf(x)), RED);
+                    //爷爷节点向上递归
+                    x=parentOf(parentOf(x));
                 }
+                //第三种情形
                 else{
-                    if(leftOf(parentOf(x)) ==  x){
+                    //如果x是x的父节点的左子结点，围绕x的父节点进行右旋转
+                    if(leftOf(parentOf(x)) == x){
                         x = parentOf(x);
                         rightRotate(x);
                     }
+                    //如果是右3，即x是其父节点的右子结点，
+                    //将父节点设为黑色，爷爷结点设为红色，并且围绕
+                    //爷爷结点进行左旋转
                     setColor(parentOf(x), BLACK);
                     setColor(parentOf(parentOf(x)), RED);
                     leftRotate(parentOf(parentOf(x)));
                 }
             }
         }
+        //最后地轨道根结点，将根节点设为黑色
         root.color = BLACK;
     }
 
