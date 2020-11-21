@@ -5,6 +5,8 @@
  * @author Wei Bin 魏斌
  * @date 2020/11/19
  */
+
+@SuppressWarnings({"all"})
 public class MyRedBlackTree<K extends Comparable<K>, V> {
     private static boolean RED = false;
     private static boolean BLACK = true;
@@ -25,7 +27,7 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
      */
     private void leftRotate(RBNode p){
         if(p != null){
-            //给p的右子结点一个应用
+            //给p的右子结点一个引用
             RBNode r = p.right;
             //旋转之后p的右子结点指向现在的右子结点的左结点
             p.right = r.left;
@@ -81,7 +83,7 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
             }
             //反之将p的父节点的左子结点设为l
             else{
-                p.parent.right = l;
+                p.parent.left = l;
             }
             //l的右子结点设为p，p的父节点设为l
             l.right = p;
@@ -123,7 +125,7 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
             }
         } while(t != null);
         //新建一个新的插入结点，父节点是当前的叶子结点
-        RBNode node = new RBNode<>(key, value == null ? key : value, parent);
+        RBNode<K, Object> node = new RBNode<>(key, value == null ? key : value, parent);
         if(cmp < 0){
             //如果cmp<0，则将新节点设为那个叶子结点的左子结点
             parent.left = node;
@@ -132,13 +134,15 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
             //否则设为右子结点
             parent.right = node;
         }
+        //调整
+        fixAfterPut(node);
     }
 
     /**
      * 1、2-3-4树：新增元素+2节点合并（节点中只有1个元素）=3节点（节点中有2个元素）
      *    红黑树：新增一个红色节点+黑色父亲节点=上黑下红（2节点）--------------------不要调整
      *
-     * 2、2-3-4树：新增元素+3节点合并（节点中有2个元素）=4节点（节点中有3个元素）
+     * 2、2-3-4树：新增元素+3节点合并（节点中有2个元素）=4节点（节点中有3个元素）t
      *    这里有4种小情况（左3，右3，还有2个左中右不需要调整）------左3，右3需要调整，其余2个不需要调整
      *    红黑树：新增红色节点+上黑下红=排序后中间节点是黑色，两边节点都是红色（3节点）
      *
@@ -148,7 +152,7 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
      *
      * @param x
      */
-    private void fixAferPut(RBNode x){
+    private void fixAfterPut(RBNode x){
         //将被添加结点的颜色设为红色
         x.color = RED;
         //如果父节点为黑色，则不需要调整，直接添加即可
@@ -165,7 +169,7 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
                     setColor(y, BLACK);
                     setColor(parentOf(parentOf(x)), RED);
                     //爷爷节点向上递归
-                    x=parentOf(parentOf(x));
+                    x = parentOf(parentOf(x));
                 }
                 //第二种情形
                 else{
@@ -181,8 +185,8 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
                     setColor(parentOf(x), BLACK);
                     setColor(parentOf(parentOf(x)), RED);
                     rightRotate(parentOf(parentOf(x)));
-                    //爷爷结点向上递归
-                    x = parentOf(parentOf(x));
+//                    //爷爷结点向上递归
+//                    x = parentOf(parentOf(x));
                 }
             }
 
@@ -197,7 +201,7 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
                     setColor(y, BLACK);
                     setColor(parentOf(parentOf(x)), RED);
                     //爷爷节点向上递归
-                    x=parentOf(parentOf(x));
+                    x = parentOf(parentOf(x));
                 }
                 //第三种情形
                 else{
@@ -289,8 +293,8 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
     }
 
     public V remove(K key){
-        RBNode node=getNode(key);
-        if(node==null){
+        RBNode node = getNode(key);
+        if(node == null){
             return null;
         }
         V oldValue = (V) node.value;
@@ -319,7 +323,7 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
         //子节点为空则说明本结点是叶子结点
         if(replacement != null){
             //替代者的父指针指向的原来node的父亲
-            replacement.parent=node.parent;
+            replacement.parent = node.parent;
             if(node.parent == null){
                 root = replacement;
             }
@@ -371,7 +375,7 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
                 if(colorOf(rnode) == RED){
                     setColor(rnode, BLACK);
                     setColor(parentOf(rnode), RED);
-                    leftRotate(x);
+                    leftRotate(parentOf(x));
                     rnode = rightOf(parentOf(x));
                 }
 
@@ -491,36 +495,55 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
             this.key = key;
             this.value = value;
         }
-        public boolean isColor() {
-            return color;
+
+        public RBNode getParent() {
+            return parent;
         }
+
+        public void setParent(RBNode parent) {
+            this.parent = parent;
+        }
+
         public RBNode getLeft() {
             return left;
         }
+
+        public void setLeft(RBNode left) {
+            this.left = left;
+        }
+
         public RBNode getRight() {
             return right;
         }
+
+        public void setRight(RBNode right) {
+            this.right = right;
+        }
+
+        public boolean isColor() {
+            return color;
+        }
+
+        public void setColor(boolean color) {
+            this.color = color;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public void setKey(K key) {
+            this.key = key;
+        }
+
         public V getValue() {
             return value;
         }
-    }
 
-    public void inorderTraverse(){
-        if(root == null){
-            throw new NullPointerException();
+        public void setValue(V value) {
+            this.value = value;
         }
-        inorder(root);
     }
-
-    private void inorder(RBNode node){
-        if(node == null){
-            throw new NullPointerException();
-        }
-        inorder(node.left);
-        System.out.print(node.color + " ");
-        inorder(node.right);
-    }
-
     public RBNode getRoot(){
         return root;
     }
