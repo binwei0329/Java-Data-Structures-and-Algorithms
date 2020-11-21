@@ -157,17 +157,17 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
             //如果x的父节点是爷爷结点的左子结点
             if(parentOf(x) == leftOf(parentOf(parentOf(x)))){
                 //给叔叔结点一个引用
-                 RBNode y = rightOf(parentOf(parentOf(x)));
-                 //如果叔叔结点的颜色为红色，这对应第三种情形
-                 if(colorOf(y) == RED){
-                     //将x的父亲结点和叔叔节点的颜色设为黑色，爷爷结点设为红色
-                     setColor(parentOf(x), BLACK);
-                     setColor(y, BLACK);
-                     setColor(parentOf(parentOf(x)), RED);
-                     //爷爷节点向上递归
-                     x=parentOf(parentOf(x));
-                 }
-                 //第二种情形
+                RBNode y = rightOf(parentOf(parentOf(x)));
+                //如果叔叔结点的颜色为红色，这对应第三种情形
+                if(colorOf(y) == RED){
+                    //将x的父亲结点和叔叔节点的颜色设为黑色，爷爷结点设为红色
+                    setColor(parentOf(x), BLACK);
+                    setColor(y, BLACK);
+                    setColor(parentOf(parentOf(x)), RED);
+                    //爷爷节点向上递归
+                    x=parentOf(parentOf(x));
+                }
+                //第二种情形
                 else{
                     //如果x是x的父节点的右子结点
                     if(rightOf(parentOf(x)) ==  x){
@@ -176,8 +176,8 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
                         leftRotate(x);
                     }
                     //如果是左3，即添加的结点是原来叶子节点的左子结点，
-                     // 原来叶子结点是是其父节点的左子结点，则将x的父节点设为红色，
-                     // 爷爷结点设为黑色，并且围绕爷爷结点进行右旋转
+                    // 原来叶子结点是是其父节点的左子结点，则将x的父节点设为红色，
+                    // 爷爷结点设为黑色，并且围绕爷爷结点进行右旋转
                     setColor(parentOf(x), BLACK);
                     setColor(parentOf(parentOf(x)), RED);
                     rightRotate(parentOf(parentOf(x)));
@@ -217,6 +217,173 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
         }
         //最后地轨道根结点，将根节点设为黑色
         root.color = BLACK;
+    }
+
+    /**
+     * 找后继节点，即大于节点的最小值
+     * @param node
+     * @return
+     */
+    private RBNode getNext(RBNode node){
+        if(node == null){
+            return null;
+        }
+        else if(node.right != null){
+            RBNode r = node.right;
+            while(r.left != null){
+                r = r.left;
+            }
+            return r;
+        }
+        else{
+            RBNode pa = node.parent;
+            RBNode ch = node;
+            while(pa != null && ch == pa.right){
+                ch = pa;
+                pa = pa.parent;
+            }
+            return pa;
+        }
+    }
+
+    /**
+     * 找到指定节点的前驱节点，即找小于node节点的最大值
+     * @param node
+     */
+    private RBNode getPre(RBNode node){
+        if(node == null){
+            return null;
+        }
+        else if(node.left != null){
+            RBNode l = node.left;
+            while(l.right != null){
+                l = l.right;
+            }
+            return l;
+        }
+        else{
+            RBNode pa = node.parent;
+            RBNode ch = pa;
+            while(pa != null && ch == pa.left){
+                ch = pa;
+                pa = pa.parent;
+            }
+            return pa;
+        }
+    }
+
+    private RBNode getNode(K key){
+        RBNode node=this.root;
+        while(node!=null){
+            int cmp = key.compareTo((K) node.key);
+            if(cmp<0){
+                node=node.left;
+            }
+            else if(cmp>0){
+                node=node.right;
+            }
+            else
+                return node;
+        }
+        return null;
+    }
+
+    public V remove(K key){
+        RBNode node=getNode(key);
+        if(node==null){
+            return null;
+        }
+        V oldValue = (V) node.value;
+        deleteNode(node);
+        return oldValue;
+    }
+
+    /**
+     * 删除操作：
+     * 1、删除叶子节点，直接删除
+     * 2、删除的节点有一个子节点，那么用子节点来替代
+     * 3、如果删除的节点有2个子节点，此时需要找到前驱节点或者后继节点来替代
+     *
+     * @param node
+     */
+    private void deleteNode(RBNode node){
+        //第三种情况：如果删除的节点有两个子结点
+        if(node.left != null && node.right != null){
+            RBNode next = getNext(node);
+            node.key = next.key;
+            node.value = next.value;
+            node = next;
+        }
+        //使用替代结点的左子结点或者右子结点来替代
+        RBNode replacement = node.left == null ? node.right : node.left;
+        //子节点为空则说明本结点是叶子结点
+        if(replacement != null){
+            node.parent = replacement.parent;
+            if(node.parent == null){
+                root = replacement;
+            }
+            else if(node == leftOf(parentOf(node))){
+                node.parent.left = replacement;
+            }
+            else{
+                node.parent.right = replacement;
+            }
+            //将node有关的指针都设置为空，就是断开node的所有指针，等待gc回收
+            node.left = node.right = node.parent = null;
+
+            if(node.color == BLACK) {
+                //删除之后进行一定调整
+                fixAfterDelete(replacement);
+            }
+        }
+        //node此时为根结点
+        else if(node.parent == null){
+            root = null;
+        }
+
+        //删除的节点是叶子结点，即node的replacement为空
+        else{
+            if(node.color == BLACK){
+                fixAfterDelete(node);
+            }
+
+            if(node.parent != null){
+                if(node == leftOf(parentOf(node))){
+                    node.parent.left = null;
+                }
+                else{
+                    node.parent.right = null;
+                }
+                node.parent = null;
+            }
+        }
+    }
+
+    private void fixAfterDelete(RBNode x){
+        //如果x不是根结点并且x是一个黑色结点
+        if(x != root && colorOf(x) == BLACK){
+            //如果x是左节点
+            if(x == leftOf(parentOf(x))){
+                //找到兄弟结点
+                RBNode rnode = rightOf(parentOf(x));
+                //判断此时兄弟结点是否是x的真正的兄弟结点
+                if(colorOf(rnode) == RED){
+                    setColor(rnode, BLACK);
+                    setColor(parentOf(rnode), RED);
+                    leftRotate(x);
+                    rnode = rightOf(parentOf(x));
+                }
+
+                //情况三：本节点搞不定，只能找兄弟借一个结点，兄弟没得借
+                if(colorOf(leftOf(rnode)) == BLACK && colorOf(rightOf(rightOf(rnode))) == BLACK){
+
+                }
+                //情况二：本节点搞不定，只能找兄弟结点,兄弟借给结点
+                else{
+
+                }
+            }
+        }
     }
 
     private void setColor(RBNode node, boolean color){
@@ -312,5 +479,4 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
     public RBNode getRoot(){
         return root;
     }
-
 }
