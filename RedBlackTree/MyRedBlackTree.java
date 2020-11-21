@@ -318,7 +318,8 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
         RBNode replacement = node.left == null ? node.right : node.left;
         //子节点为空则说明本结点是叶子结点
         if(replacement != null){
-            node.parent = replacement.parent;
+            //替代者的父指针指向的原来node的父亲
+            replacement.parent=node.parent;
             if(node.parent == null){
                 root = replacement;
             }
@@ -375,15 +376,59 @@ public class MyRedBlackTree<K extends Comparable<K>, V> {
                 }
 
                 //情况三：本节点搞不定，只能找兄弟借一个结点，兄弟没得借
-                if(colorOf(leftOf(rnode)) == BLACK && colorOf(rightOf(rightOf(rnode))) == BLACK){
-
+                if(colorOf(leftOf(rnode)) == BLACK && colorOf(rightOf(rnode)) == BLACK){
+                    setColor(rnode, RED);
+                    x = parentOf(x);
                 }
                 //情况二：本节点搞不定，只能找兄弟结点,兄弟借给结点
                 else{
-
+                    //分两种情形：兄弟是三节点或者四结点
+                    //首先是三节点的情况
+                    if(colorOf(rightOf(rnode)) == BLACK){
+                        setColor(leftOf(rnode), BLACK);
+                        setColor(rnode, RED);
+                        rightRotate(rnode);
+                        rnode = rightOf(parentOf(x));
+                    }
+                    //然后是四结点的情况
+                    setColor(rnode, colorOf(parentOf(rnode)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(rightOf((rnode)), BLACK);
+                    leftRotate(parentOf(x));
+                    x = root;
+                }
+            }
+            //如果被删除的结点是右子结点
+            else{
+                RBNode lnode = leftOf(parentOf(x));
+                if(colorOf(lnode) == RED){
+                    setColor(lnode, BLACK);
+                    setColor(parentOf(x), RED);
+                    rightRotate(parentOf(x));
+                    lnode = leftOf(parentOf(x));
+                }
+                if(colorOf(rightOf(lnode)) == BLACK && colorOf(leftOf(lnode)) == BLACK){
+                    setColor(lnode, RED);
+                    x = parentOf(x);
+                }
+                else{
+                    if(colorOf(leftOf(lnode)) == BLACK){
+                        setColor(rightOf(lnode), BLACK);
+                        setColor(lnode, RED);
+                        leftRotate(lnode);
+                        lnode = leftOf(parentOf(x));
+                    }
+                    setColor(lnode, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(leftOf(lnode), BLACK);
+                    rightRotate(parentOf(x));
+                    x = root;
                 }
             }
         }
+        //如果被删除的结点x是红色结点
+        //情形一：替代结点为红色结点，则将替代结点设为黑色，补偿被删除的黑色结点，使红黑树保持黑色平衡
+        setColor(x, BLACK);
     }
 
     private void setColor(RBNode node, boolean color){
