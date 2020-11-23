@@ -2,7 +2,7 @@
  * 本类实现了一个红黑树及其插入删除操作。
  * @param <K> 插入的数据的键的类型
  * @param <V> 插入的数据值的类型
- * @author Wei Bin 魏斌
+ * @author Wei Bin
  * @date 2020/11/19
  */
 
