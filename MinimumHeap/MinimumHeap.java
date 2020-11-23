@@ -62,6 +62,80 @@ public class MinimumHeap<T>  {
         node.setElement(temp);
     }
 
+    public T removeMinimum(){
+        if(root == null){
+            throw new RuntimeException("Empty collection exception.");
+        }
+        T value = root.getElement();
+        if(getSize() == 1){
+            root = null;
+            last = null;
+        }
+        else{
+            MyHeapNode<T> newLast = getNewLastNode();
+            if(last.getParent().getLeftNode() == last){
+                last.getParent().setLeftNode(null);
+            }
+            else{
+                last.getParent().setRightNode(null);
+            }
+            ((MyHeapNode<T>)root).setElement(last.getElement());
+            last = newLast;
+            alterHeap();
+        }
+
+        return value;
+    }
+
+    private MyHeapNode<T> getNewLastNode(){
+        if(root == null){
+            throw new RuntimeException("Empty collection exception.");
+        }
+        while(last != root && last == last.getParent().getLeftNode()){
+            last = last.getParent();
+        }
+        if(last != root){
+            last = (MyHeapNode<T>)last.getParent().getLeftNode();
+        }
+        while(last.getRightNode() != null){
+            last = (MyHeapNode<T>)last.getRightNode();
+        }
+        return last;
+    }
+
+    private void alterHeap(){
+        T temp;
+        MyHeapNode<T> node = root;
+        MyHeapNode<T> left = (MyHeapNode<T>)node.getLeftNode();
+        MyHeapNode<T> right = (MyHeapNode<T>)node.getRightNode();
+        MyHeapNode<T> next;
+
+        if((left == null) && (right == null))
+            next = null;
+        else if(right == null)
+            next = left;
+        else if(((Comparable)left.getElement()).compareTo(right.getElement()) < 0)
+            next = left;
+        else
+            next = right;
+        temp = node.getElement();
+        while((next != null) && ((Comparable)next.getElement()).compareTo(temp) < 0){
+            node.setElement(next.getElement());
+            node = next;
+            left = (MyHeapNode<T>) node.getLeftNode();
+            right = (MyHeapNode<T>) node.getRightNode();
+            if((left == null) && (right == null))
+                next = null;
+            else if(right == null)
+                next = left;
+            else if(((Comparable)left.getElement()).compareTo(right.getElement()) < 0)
+                next = left;
+            else
+                next = right;
+        }
+        node.setElement(temp);
+    }
+
     public int getSize(){
         return root == null ? 0 : preorderTraversal().size();
     }
