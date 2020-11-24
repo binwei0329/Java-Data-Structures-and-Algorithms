@@ -59,7 +59,7 @@ public interface MyGraphInterface<T> {
     public Iterator iteratorShortestPath(T startVertex, T targetVertex);
 
     /**
-     * 判断两个节点是否通过边相连
+     * 判断整个图是否通过边相连
      * @return 布尔值
      */
     public abstract boolean isConnected();
