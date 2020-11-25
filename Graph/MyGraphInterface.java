@@ -41,7 +41,7 @@ public interface MyGraphInterface<T> {
      * 广度优先搜索(breadth first search)
      * @param start 起始顶点
      */
-    public abstract ArrayList<T>  breadthFirstSearch(int start);
+    public abstract ArrayList<T> breadthFirstSearch(int start);
 
     /**
      * 深度优先搜索(breadth first search)

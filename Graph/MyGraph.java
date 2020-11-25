@@ -150,44 +150,35 @@ public class MyGraph<T> implements MyGraphInterface<T> {
     }
 
     @Override
-    public ArrayList<T>  breadthFirstSearch(int start) {
-//        Integer index;
-//        boolean found = false;
-//        ArrayList<T> list = new ArrayList<>(num);
-//        //创建一个stack来存储每个顶点的顺序
-//        Stack<Integer> stack = new Stack<>();
-//        //创建一个布尔类型的数组用来表示每个顶点是否被遍历过并将
-//        //其中的每一个值设为false
-//        boolean[] visited = new boolean[num];
-//        for(boolean b : visited){
-//            b = false;
-//        }
-//
-//        //将开始顶点的下标存入栈中，并声明该顶点已被遍历过
-//        stack.push(start);
-//        list.add(vertices[start]);
-//        visited[start] = true;
-//
-//        while(!stack.isEmpty()){
-//            index = stack.peek();
-//            found = false;
-//            //遍历每一个与下标为index的顶点相邻的顶点，如果该顶点还没有被遍历过，
-//            //将其入栈
-//            for(int i = 0; (i < num) && !found; i++){
-//                if(adjMat[index][i] == 1 && !visited[i]){
-//                    stack.push(i);
-//                    list.add(vertices[i]);
-//                    visited[i] = true;
-//                    found = true;
-//                }
-//            }
-//        }
-//        if(!found && !stack.isEmpty()){
-//            stack.pop();
-//        }
-//        for(int i = num - 1; i >= 0; i--){
-//            System.out.println(list.get(i));
-//        }
+    public ArrayList<T> breadthFirstSearch(int start) {
+        Integer index;
+        ArrayList<T> list = new ArrayList<>(num);
+        //创建一个queue来存储每个顶点的顺序
+        MyLinkedQueue<Integer> queue = new MyLinkedQueue<>();
+        //创建一个布尔类型的数组用来表示每个顶点是否被遍历过并将
+        //其中的每一个值设为false
+        boolean[] visited = new boolean[num];
+        for(int i = 0; i < num; i++){
+            visited[i] = false;
+        }
+
+        //将开始顶点的下标放入队列中，并声明该顶点已被遍历过
+        queue.enqueue(start);
+        visited[start] = true;
+
+        while(!queue.isEmpty()) {
+            index = queue.dequeue();
+            list.add(vertices[index]);
+            //遍历每一个与下标为index的顶点相邻的顶点，如果该顶点还没有被遍历过，
+            //将其入列
+            for (int i = 0; i < num; i++) {
+                if (adjMat[index][i] == 1 && !visited[i]) {
+                    queue.enqueue(i);
+                    visited[i] = true;
+                }
+            }
+        }
+        return list;
     }
 
     @Override
@@ -250,9 +241,13 @@ public class MyGraph<T> implements MyGraphInterface<T> {
         return null;
     }
 
+    /**
+     * 测试图的连通性，当且仅当广度优先搜索中的顶点数目等于图中的顶点数目时，该图才是连通的
+     * @return
+     */
     @Override
     public boolean isConnected() {
-        return false;
+        return breadthFirstSearch(0).size() == num;
     }
 
     @Override
@@ -271,5 +266,62 @@ public class MyGraph<T> implements MyGraphInterface<T> {
             builder.append(vertices[i] + " ");
         }
         return builder.toString();
+    }
+}
+
+class MyLinkedQueue<T>{
+    private Node<T> head;
+    private int size;
+
+    public MyLinkedQueue(){
+        head = new Node();
+    }
+
+    public boolean enqueue(T data){
+        if(this.size == 0){
+            head = new Node<>(data);
+            size++;
+            return true;
+        }
+
+        else{
+            Node<T> current = head;
+            while(current.next != null){
+                current = current.next;
+            }
+            current.next = new Node<>(data);
+            this.size++;
+            return true;
+        }
+    }
+
+    public T dequeue(){
+        if(this.size == 0){
+            return null;
+        }
+        else{
+            T result = head.data;
+            head = head.next;
+            this.size--;
+            return result;
+        }
+    }
+
+    public int getSize(){
+        return this.size;
+    }
+
+    public boolean isEmpty(){
+        return size == 0;
+    }
+
+    class Node<T>{
+        T data;
+        Node<T> next;
+
+        public Node(){}
+        public Node(T data){
+            this.data = data;
+        }
     }
 }
