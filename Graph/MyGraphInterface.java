@@ -38,17 +38,15 @@ public interface MyGraphInterface<T> {
 
     /**
      * 广度优先搜索(breadth first search)
-     * @param startVertex 起始顶点
-     * @return 广度优先遍历器
+     * @param start 起始顶点
      */
-    public abstract Iterator iteratorBFS(T startVertex);
+    public abstract void breadthFirstSearch(int start);
 
     /**
      * 深度优先搜索(breadth first search)
-     * @param startVertex 起始顶点
-     * @return 深度优先遍历器
+     * @param start 起始顶点
      */
-    public abstract Iterator iteratorDFS(T startVertex);
+    public abstract void depthFirstSearch(int start);
 
     /**
      * 两个顶点之间的最短路径遍历器
