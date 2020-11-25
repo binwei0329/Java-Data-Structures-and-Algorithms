@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -40,13 +41,13 @@ public interface MyGraphInterface<T> {
      * 广度优先搜索(breadth first search)
      * @param start 起始顶点
      */
-    public abstract void breadthFirstSearch(int start);
+    public abstract ArrayList<T>  breadthFirstSearch(int start);
 
     /**
      * 深度优先搜索(breadth first search)
      * @param start 起始顶点
      */
-    public abstract void depthFirstSearch(int start);
+    public abstract ArrayList<T> depthFirstSearch(int start);
 
     /**
      * 两个顶点之间的最短路径遍历器

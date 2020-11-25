@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Stack;
 
 /**
  *本类实现了图这个数据结构以及其主要方法。
@@ -12,20 +14,26 @@ import java.util.Iterator;
 public class MyGraph<T> implements MyGraphInterface<T> {
     protected final int DEFAULT_CAPACITY = 8;
     protected int num; //顶点数量
-    protected boolean adjMat[][]; //邻接矩阵
+    protected int adjMat[][]; //邻接矩阵
     protected T[] vertices; //顶点
 
+    //默认构造方法
     public MyGraph(){
         num = 0;
-        adjMat = new boolean[DEFAULT_CAPACITY][DEFAULT_CAPACITY];
+        adjMat = new int[DEFAULT_CAPACITY][DEFAULT_CAPACITY];
         vertices = (T[]) (new Object[DEFAULT_CAPACITY]);
     }
 
+    //带参构造方法
     public MyGraph(int numVer){
-        adjMat = new boolean[numVer][numVer];
+        adjMat = new int[numVer][numVer];
         vertices = (T[])(new Object[numVer]);
     }
 
+    /**
+     * 向图中添加顶点
+     * @param ele 存储在顶点中的元素
+     */
     @Override
     public void addVertex(T ele) {
         if(num == 0){
@@ -38,17 +46,22 @@ public class MyGraph<T> implements MyGraphInterface<T> {
         }
     }
 
+    /**
+     * 从图中删除顶点
+     * @param ele 需要删除的顶点的元素
+     */
     @Override
     public void removeVertex(T ele) {
         if(num == 0){
             throw new RuntimeException("Empty graph exception.");
         }
         else{
-            int index = getIndex(ele);
+            int index = getIndex(ele); //获取要删除顶点的下标
             if(index == -1){
                 throw new RuntimeException("Vertex not found exception.");
             }
             else {
+                //删除顶点，并将与该顶点相连接的边都移除
                 vertices[index] = null;
                 for(int i = index; i < num - 1; i++){
                     vertices[i] = vertices[i + 1];
@@ -60,16 +73,21 @@ public class MyGraph<T> implements MyGraphInterface<T> {
         }
     }
 
-    private boolean[][] removeVertexEdge(int index){
-        boolean[][] temp = new boolean[num - 1][num - 1];
+    /**
+     * 本方法删除与某个被删除顶点相连接的边
+     * @param index 被删除元素的下标
+     * @return 新的邻接矩阵
+     */
+    private int[][] removeVertexEdge(int index){
+        int[][] temp = new int[num - 1][num - 1];
         if(index < 0){
             throw new RuntimeException("Vertex not found exception.");
         }
         else {
             for(int m = 0; m < num; m++){
                 if(m < index) {
-                    boolean[] array = new boolean[num - 1];
-                    boolean[] vec = adjMat[m];
+                    int[] array = new int[num - 1];
+                    int[] vec = adjMat[m];
                     for (int k = 0; k < index; k++) {
                         array[k] = vec[k];
                     }
@@ -80,8 +98,8 @@ public class MyGraph<T> implements MyGraphInterface<T> {
                 }
 
                 else if(m > index){
-                    boolean[] array = new boolean[num - 1];
-                    boolean[] vec = adjMat[m];
+                    int[] array = new int[num - 1];
+                    int[] vec = adjMat[m];
                     for (int k = 0; k < index; k++) {
                         array[k] = vec[k];
                     }
@@ -95,6 +113,11 @@ public class MyGraph<T> implements MyGraphInterface<T> {
         return temp;
     }
 
+    /**
+     * 添加两个顶点之间的一条边
+     * @param ele1 边连接的顶点的元素1
+     * @param ele2 边连接的顶点的元素2
+     */
     @Override
     public void addEdge(T ele1, T ele2) {
         int ind1 = getIndex(ele1);
@@ -103,11 +126,16 @@ public class MyGraph<T> implements MyGraphInterface<T> {
             throw new RuntimeException("Illegal vertex exception.");
         }
         else{
-            adjMat[ind1][ind2] = true;
-            adjMat[ind2][ind1] = true;
+            adjMat[ind1][ind2] = 1;
+            adjMat[ind2][ind1] = 1;
         }
     }
 
+    /**
+     * 删除两个顶点之间的边
+     * @param ele1 边连接的顶点的元素1
+     * @param ele2 边连接的顶点的元素2
+     */
     @Override
     public void removeEdge(T ele1, T ele2) {
         int ind1 = getIndex(ele1);
@@ -116,11 +144,96 @@ public class MyGraph<T> implements MyGraphInterface<T> {
             throw new RuntimeException("Illegal vertex exception.");
         }
         else{
-            adjMat[ind1][ind2] = false;
-            adjMat[ind2][ind1] = false;
+            adjMat[ind1][ind2] = 0;
+            adjMat[ind2][ind1] = 0;
         }
     }
 
+    @Override
+    public ArrayList<T>  breadthFirstSearch(int start) {
+//        Integer index;
+//        boolean found = false;
+//        ArrayList<T> list = new ArrayList<>(num);
+//        //创建一个stack来存储每个顶点的顺序
+//        Stack<Integer> stack = new Stack<>();
+//        //创建一个布尔类型的数组用来表示每个顶点是否被遍历过并将
+//        //其中的每一个值设为false
+//        boolean[] visited = new boolean[num];
+//        for(boolean b : visited){
+//            b = false;
+//        }
+//
+//        //将开始顶点的下标存入栈中，并声明该顶点已被遍历过
+//        stack.push(start);
+//        list.add(vertices[start]);
+//        visited[start] = true;
+//
+//        while(!stack.isEmpty()){
+//            index = stack.peek();
+//            found = false;
+//            //遍历每一个与下标为index的顶点相邻的顶点，如果该顶点还没有被遍历过，
+//            //将其入栈
+//            for(int i = 0; (i < num) && !found; i++){
+//                if(adjMat[index][i] == 1 && !visited[i]){
+//                    stack.push(i);
+//                    list.add(vertices[i]);
+//                    visited[i] = true;
+//                    found = true;
+//                }
+//            }
+//        }
+//        if(!found && !stack.isEmpty()){
+//            stack.pop();
+//        }
+//        for(int i = num - 1; i >= 0; i--){
+//            System.out.println(list.get(i));
+//        }
+    }
+
+    @Override
+    public ArrayList<T> depthFirstSearch(int start) {
+        Integer index;
+        boolean found = false;
+        ArrayList<T> list = new ArrayList<>(num);
+        //创建一个stack来存储每个顶点的顺序
+        Stack<Integer> stack = new Stack<>();
+        //创建一个布尔类型的数组用来表示每个顶点是否被遍历过并将
+        //其中的每一个值设为false
+        boolean[] visited = new boolean[num];
+        for(int i = 0; i < num; i++){
+            visited[i] = false;
+        }
+
+        //将开始顶点的下标存入栈中，并声明该顶点已被遍历过
+        stack.push(start);
+        list.add(vertices[start]);
+        visited[start] = true;
+
+        while(!stack.isEmpty()){
+            index = stack.peek();
+            found = false;
+            //遍历每一个与下标为index的顶点相邻的顶点，如果该顶点还没有被遍历过，
+            //将其入栈
+            for(int i = 0; (i < num) && !found; i++){
+                if(adjMat[index][i] == 1 && !visited[i]){
+                    stack.push(i);
+                    list.add(vertices[i]);
+                    visited[i] = true;
+                    found = true;
+                }
+            }
+            if(!found && !stack.isEmpty()) {
+                stack.pop();
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 获取某个元素的下标
+     * @param ele 元素
+     * @return 该元素的下标
+     */
     private int getIndex(T ele){
         int index = -1;
         for(int ind = 0; ind < num; ind++){
@@ -130,16 +243,6 @@ public class MyGraph<T> implements MyGraphInterface<T> {
             }
         }
         return index;
-    }
-
-    @Override
-    public Iterator iteratorBFS(T startVertex) {
-        return null;
-    }
-
-    @Override
-    public Iterator iteratorDFS(T startVertex) {
-        return null;
     }
 
     @Override
