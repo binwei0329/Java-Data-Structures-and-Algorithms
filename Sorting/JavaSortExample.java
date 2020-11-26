@@ -4,7 +4,7 @@
  * 2020/11/26
  */
 
-public class JavaSortExanple {
+public class JavaSortExample {
     public static void main(String[] args){
         int[] array = new int[]{1, 8, 3, 6, 7, 5};
 //        bubbleSort(array);
