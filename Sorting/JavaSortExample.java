@@ -8,7 +8,9 @@ public class JavaSortExample {
     public static void main(String[] args){
         int[] array = new int[]{1, 8, 3, 6, 7, 5};
 //        bubbleSort(array);
-        insertionSort(array);
+//        insertionSort(array);
+//        selectionSort(array);
+        quickSort(array, 0, array.length - 1);
         for (int i = 0; i < array.length; i++) {
             System.out.print(array[i] + " ");
         }
@@ -53,5 +55,57 @@ public class JavaSortExample {
                 array[k + 1] = temp;
             }
         }
+    }
+
+    /**
+     * 选择排序
+     * @param array 数据
+     */
+    public static void selectionSort(int[] array){
+        for(int i = 0; i < array.length; i++){
+            int minIndex = i;
+            //将当前的数和之后的每个数进行比较，如果后面的数小，就交换
+            for(int j = i + 1; j< array.length; j++){
+                if(array[j] < array[minIndex]){
+                    minIndex = j;
+                }
+            }
+            if(minIndex != i){
+                int temp = array[i];
+                array[i] = array[minIndex];
+                array[minIndex] = temp;
+            }
+        }
+    }
+
+    public static void quickSort(int[] array, int left, int right){
+        if(left > right)
+            return;
+        //将一个数组中的最左面的的元素当做基准数
+        int base = array[left];
+        int i = left;
+        int j = right;
+
+        //当i j 不相等时，分别从数组的左面和右面遍历
+        while(i != j) {
+            while (array[j] >= base && i < j) {
+                j--;
+            }
+            while (array[i] <= base && i < j) {
+                i++;
+            }
+
+            //在i和j交汇时，交换两个元素
+            int temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+        //当数组中的第i个元素大于基准数时，和基准数进行交换
+        array[left] = array[i];
+        array[i] = base;
+
+        //再1️⃣相同的方法对数组中剩余的元素进行处理
+        quickSort(array, left, i - 1);
+        quickSort(array, i + 1, right);
     }
 }
