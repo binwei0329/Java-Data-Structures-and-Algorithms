@@ -10,7 +10,8 @@ public class JavaSortExample {
 //        bubbleSort(array);
 //        insertionSort(array);
 //        selectionSort(array);
-        quickSort(array, 0, array.length - 1);
+//        quickSort(array, 0, array.length - 1);
+        mergeSort(array, 0, array.length - 1);
         for (int i = 0; i < array.length; i++) {
             System.out.print(array[i] + " ");
         }
@@ -107,5 +108,68 @@ public class JavaSortExample {
         //再1️⃣相同的方法对数组中剩余的元素进行处理
         quickSort(array, left, i - 1);
         quickSort(array, i + 1, right);
+    }
+
+    public static void mergeSort(int[] array, int low, int high){
+        if(low < high){
+            //递归调用排序方法，最后合并
+            int mid = (low + high) / 2;
+            mergeSort(array, low, mid);
+            mergeSort(array, mid + 1 , high);
+            merge(array, low, high);
+        }
+    }
+
+    /**
+     * 本方法将归并排序中的合并操作实现了
+     * @param array 待合并数组
+     * @param low 数组起点
+     * @param high 数组终点
+     */
+    private static void merge(int[] array, int low, int high){
+        //临时数组用来储存数据
+        int[] temp = new int[high - low + 1];
+        //找到中间位置的数
+        int mid = (high + low) / 2;
+        //分别从开始位置和中间位置进行处理
+        int i = low;
+        int j = mid + 1;
+        //临时数组中的起始位置
+        int index = 0;
+        //从数组的起始位置和中间位置开始检索
+        while(i <= mid && j <= high) {
+            //分别将前半部分的数据和后半部分的数据进行比较
+            //如果前面的小于后面的，就将该数据放入临时数组中，
+            //并继续在前半部分中向后遍历，直到前半部分里的某个数据
+            //大于后半部分的某个数据
+            if (array[i] <= array[j]) {
+                temp[index] = array[i];
+                i++;
+            }
+            //如果是另外一种情况的话，将后半部分的数据放入临时数组当中
+            else {
+                temp[index] = array[j];
+                j++;
+            }
+            index++;
+        }
+
+        //如果前半部分的数据已经全部放入临时数组中了，
+        //而后半部分还有多余数据，则将剩下的数据依次放入临时数组中
+        while(j <= high){
+            temp[index] = array[j];
+            j++;
+            index++;
+        }
+        //反之如果前面部分多余的数据放入临时数组中
+        while(i <= mid){
+            temp[index] = array[i];
+            i++;
+            index++;
+        }
+        //将已经排好顺序的数据从low的位置开始依次放入原数组中
+        for(int k = 0; k < temp.length; k++){
+            array[k + low] = temp[k];
+        }
     }
 }
