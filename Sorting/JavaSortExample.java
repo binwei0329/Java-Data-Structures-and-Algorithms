@@ -4,6 +4,7 @@
  * 2020/11/26
  */
 
+@SuppressWarnings("all")
 public class JavaSortExample {
     public static void main(String[] args){
         int[] array = new int[]{1, 8, 3, 6, 7, 5};
@@ -11,7 +12,8 @@ public class JavaSortExample {
 //        insertionSort(array);
 //        selectionSort(array);
 //        quickSort(array, 0, array.length - 1);
-        mergeSort(array, 0, array.length - 1);
+//        mergeSort(array, 0, array.length - 1);
+        radixSort(array);
         for (int i = 0; i < array.length; i++) {
             System.out.print(array[i] + " ");
         }
@@ -172,4 +174,85 @@ public class JavaSortExample {
             array[k + low] = temp[k];
         }
     }
+
+    /**
+     * 本方法实现了一个以队列作为底层结构的基数排序方法
+     * @param array 数据
+     */
+    public static void radixSort(int[] array){
+        //找到数组中最大的数
+        int max = Integer.MIN_VALUE;
+        for(int i = 0; i < array.length; i++){
+            if(array[i] > max)
+                max = array[i];
+        }
+        //获得最大的数位数
+        int maxLen = (max + "").length();
+        //创建十个队列用来存储不同的数
+        MyQueue[] temp = new MyQueue[10];
+        for(int i = 0; i < temp.length; i++){
+            temp[i] = new MyQueue();
+        }
+        //根据最大数的位数来进行遍历排序
+        for(int m = 0, s = 1 ; m < maxLen; m++, s*=10){
+            //对于数组中的每一个数，根据其余数分别把它们放进不同的队列中
+            for(int n = 0; n < array.length; n++){
+                int ys = array[n] / s % 10;
+                temp[ys].enqueue(array[n]);
+            }
+            //再从这些队列中分别将数放入原来的数组中，这样一次排序就完成了
+            //重复这一过程直至最后一轮，此时所有的数就完成排序了
+            int index = 0;
+            for(int k = 0; k < temp.length; k++) {
+                while (!temp[k].isEmpty()) {
+                    array[index] = temp[k].dequeue();
+                    index++;
+                }
+            }
+        }
+    }
+}
+
+class MyQueue {
+
+    int[] elements;
+
+    public MyQueue() {
+        elements=new int[0];
+    }
+
+    //入队
+    public void enqueue(int element) {
+        // 创建一个新的数组
+        int[] newArr = new int[elements.length + 1];
+        // 把原数组中的元素复制到新数组中
+        for (int i = 0; i < elements.length; i++) {
+            newArr[i] = elements[i];
+        }
+        // 把添加的元素放入新数组中
+        newArr[elements.length] = element;
+        // 使用新数组替换旧数组
+        elements = newArr;
+    }
+
+    //出队
+    public int dequeue() {
+        //把数组中的第0个元素取出来
+        int element = elements[0];
+        //创建一个新的数组
+        int[] newArr = new int[elements.length-1];
+        //复制原数组中的元素到新数组中
+        for(int i=0;i<newArr.length;i++) {
+            newArr[i]=elements[i+1];
+        }
+        //替换数组
+        elements=newArr;
+        return element;
+    }
+
+    //判断队列是否为空
+    public boolean isEmpty() {
+        return elements.length==0;
+    }
+
 }
